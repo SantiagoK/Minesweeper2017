@@ -3,38 +3,46 @@ import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-
+import java.io.IOException;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
-
+import javax.swing.JOptionPane;
 
 public class MyMouseAdapter extends MouseAdapter {
+	public static int flags = 14;
+	public static int grayTiles = 0;
+	public static int redTiles = 0;
+
+
+
 	public void mousePressed(MouseEvent e) {
-			Component c = e.getComponent();
-			while (!(c instanceof JFrame)) {
-				c = c.getParent();
-				if (c == null) {
-					return;
-				}
+		Component c = e.getComponent();
+		while (!(c instanceof JFrame)) {
+			c = c.getParent();
+			if (c == null) {
+				return;
 			}
-			JFrame myFrame = (JFrame) c;
-			MyPanel myPanel = (MyPanel) myFrame.getContentPane().getComponent(0);
-			Insets myInsets = myFrame.getInsets();
-			int x1 = myInsets.left;
-			int y1 = myInsets.top;
-			e.translatePoint(-x1, -y1);
-			int x = e.getX();
-			int y = e.getY();
-			myPanel.x = x;
-			myPanel.y = y;
-			myPanel.mouseDownGridX = myPanel.getGridX(x, y);
-			myPanel.mouseDownGridY = myPanel.getGridY(x, y);
-			myPanel.repaint();
-		switch(e.getButton()) {
-		case 1: // left mouse button
-			break;
+		}
+
+		JFrame myFrame = (JFrame) c;
+		MyPanel myPanel = (MyPanel) myFrame.getContentPane().getComponent(0);
+		Insets myInsets = myFrame.getInsets();
+		int x1 = myInsets.left;
+		int y1 = myInsets.top;
+		e.translatePoint(-x1, -y1);
+		int x = e.getX();
+		int y = e.getY();
+		myPanel.x = x;
+		myPanel.y = y;
+		myPanel.mouseDownGridX = myPanel.getGridX(x, y);
+		myPanel.mouseDownGridY = myPanel.getGridY(x, y);
+		myPanel.repaint();
+
+		switch (e.getButton()) {
+		case 1: // Left mouse button
+
 		case 3: // Right mouse button
-			// Do nothing
+
 			break;
 		default: // Some other button (2 = Middle mouse button, etc.)
 			// Do nothing
@@ -42,79 +50,269 @@ public class MyMouseAdapter extends MouseAdapter {
 		}
 	}
 	public void mouseReleased(MouseEvent e) {
+		Component c = e.getComponent();
+		while (!(c instanceof JFrame)) {
+			c = c.getParent();
+			if (c == null) {
+				return;
+			}
+		}
+		JFrame myFrame = (JFrame) c;
+		MyPanel myPanel = (MyPanel) myFrame.getContentPane().getComponent(0); 
+		Insets myInsets = myFrame.getInsets();
+
+		int x1 = myInsets.left;
+		int y1 = myInsets.top;
+		e.translatePoint(-x1, -y1);
+		int x = e.getX();
+		int y = e.getY();
+		myPanel.x = x;
+		myPanel.y = y;
+		int gridX = myPanel.getGridX(x, y);
+		int gridY = myPanel.getGridY(x, y);
+
 		switch (e.getButton()) {
 		case 1: // Left mouse button
-			Component c = e.getComponent();
-			while (!(c instanceof JFrame)) {
-				c = c.getParent();
-				if (c == null) {
-					return;
-				}
-			}
-			JFrame myFrame = (JFrame) c;
-			MyPanel myPanel = (MyPanel) myFrame.getContentPane().getComponent(0); // Can											// also																					// loop																					// among																					// components																					// to																					// find																					// MyPanel
-			Insets myInsets = myFrame.getInsets();
-			int x1 = myInsets.left;
-			int y1 = myInsets.top;
-			e.translatePoint(-x1, -y1);
-			int x = e.getX();
-			int y = e.getY();
-			myPanel.x = x;
-			myPanel.y = y;
-			int gridX = myPanel.getGridX(x, y);
-			int gridY = myPanel.getGridY(x, y);
-			
-			switch (e.getButton()) {
-			
-			case 1:
-				
-				if ((myPanel.mouseDownGridX == -1) || (myPanel.mouseDownGridY == -1)) {
-					// Had pressed outside
+
+			if ((myPanel.mouseDownGridX == -1) || (myPanel.mouseDownGridY == -1) || (myPanel.mouseDownGridX > 8)
+					|| (myPanel.mouseDownGridY > 8)) {
+				// Had pressed outside
+				// Do nothing
+			} else {
+				if ((gridX == -1) || (gridY == -1)) {
+					// Is releasing outside
 					// Do nothing
 				} else {
-					if ((gridX == -1) || (gridY == -1)) {
-						// Is releasing outside
+					if ((myPanel.mouseDownGridX != gridX) || (myPanel.mouseDownGridY != gridY)) {
+						// Released the mouse button on a different cell where
+						// it was pressed
 						// Do nothing
 					} else {
-						if ((myPanel.mouseDownGridX != gridX) || (myPanel.mouseDownGridY != gridY)) {
-							// Released the mouse button on a different cell where
-							// it was pressed
-							// Do nothing
+						// Released the mouse button on the same cell where it
+						// was pressed
+						if ((gridX > 8) && (gridY > 8)) {
 						} else {
-							// Released the mouse button on the same cell where it
-							// was pressed
-							if ((gridX > 8) && (gridY > 8)) {
-							
-								// On the left column and on the top row... do
-								// nothing
-							} else {
-								// On the grid other than on the left column and on
-								// the top row:
+							if(myPanel.mineField[myPanel.mouseDownGridX][myPanel.mouseDownGridY].equals(Color.RED)){
+								break;
+							}else{
+
+								//Check if the tile a mine
+								//Paints the tile black if true
+
 								if(myPanel.isMine(myPanel.mouseDownGridX, myPanel.mouseDownGridY)){
 									Color newColor = Color.BLACK;
-									for(int i = 0; i < 9; i++){
-										for (int j = 0; j < 9; j++){
+									for(int i = 0; i < 9 ; i++){
+										for (int j = 0; j < 9 ; j++){
 											if (myPanel.minesOnField[i][j] == true){
 												myPanel.mineField[i][j] = newColor;
 												myPanel.repaint();
 											}
 										}
 									}
+									//Generates Pane with losing message
+									final JOptionPane pane = new JOptionPane("Game Over!");
+									final JDialog d = pane.createDialog("	BOOM!");
+									d.setVisible(true);
+									try {
+										ActionListener();
+									} catch (IOException e1) {
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
+									break;
 								}
-								
+							}
+
+							// Paints a non-mine tile gray
+							Color newColor = Color.GRAY;
+							myPanel.mineField[myPanel.mouseDownGridX][myPanel.mouseDownGridY] = newColor;
+							checkBombs(myPanel, myPanel.mouseDownGridX, myPanel.mouseDownGridY);
+							myPanel.repaint();
+
+							grayTiles++;
+
+							//Determines if the player has won a the game
+							boolean hasWon = true;
+							for (int i = 0; i < 8 ; i++){
+								for (int j = 0; j < 8; j++){
+									if (myPanel.mineField[i][j].equals(Color.WHITE)
+											&& !myPanel.isMine(i, j)) {
+										hasWon = false;
+										break;
+									} if(!hasWon){
+										break;
+									}														
+								}
+							}
+							
+							//Generates a Pane with the Winning message
+							if (hasWon){
+								final JOptionPane pane = new JOptionPane("YOU WIN!");
+								final JDialog d = pane.createDialog("	CONGRATULATIONS!");
+								d.setVisible(true);
+								try {
+									ActionListener();
+								} catch (IOException e1) {
+									e1.printStackTrace();
+								}		
 							}
 						}
 					}
 				}
-				myPanel.repaint();
-				break;
+			}
+			myPanel.repaint();
+			break;
 		case 3: // Right mouse button
-			// Do nothing
+			
 			break;
 		default: // Some other button (2 = Middle mouse button, etc.)
 			// Do nothing
 			break;
-			}
+		}
+	}	
+	private void ActionListener() throws IOException {
+		//System.exit(0);
+		Main.masterFrame =  Main.reinitialize();
+		Main.masterFrame.setVisible(true);
+	}
+ 
+	//Gets the number of flags
+	public static String getFlags(){
+		if(flags <= 0){
+			return "0";
+		}
+		return "" + flags;
+	}
+
+	//Check each tile for adjacent mines
+	public void checkBombs (MyPanel panel, int x, int y){
+
+		int counter = 0;
+
+		if((x -1 >= 0 && x -1 < 9)
+				&&  (y >= 0 && y < 9) 
+				&& panel.isMine(x -1, y)){
+			counter ++;
+		} 
+		if((x -1 >= 0 && x -1 < 9)
+				&&  (y-1 >= 0 && y -1 < 9) 
+				&& panel.isMine(x -1, y -1 )){
+			counter ++;
+		} 
+
+		if((x  >= 0 && x < 9)
+				&&  (y-1 >= 0 && y-1 < 9) 
+				&& panel.isMine(x, y-1)){
+			counter ++;
+		} 
+		if((x +1 >= 0 && x + 1< 9)
+				&&  (y >= 0 && y < 9) 
+				&& panel.isMine(x + 1, y)){
+			counter ++;
+		} 
+		if((x + 1 >= 0 && x + 1 < 9)
+				&&  (y + 1>= 0 && y + 1 < 9) 
+				&& panel.isMine(x + 1, y + 1)){
+			counter ++;
+		} 
+		if((x >= 0 && x < 9)
+				&&  (y + 1>= 0 && y + 1< 9) 
+				&& panel.isMine(x, y + 1)){
+			counter ++;
+		} 
+		if((x -1 >= 0 && x -1 < 9)
+				&&  (y + 1 >= 0 && y + 1 < 9) 
+				&& panel.isMine(x -1, y + 1)){
+			counter ++;
+		} 
+		if((x + 1 >= 0 && x + 1 < 9)
+				&&  (y - 1 >= 0 && y - 1 < 9) 
+				&& panel.isMine(x + 1, y - 1)){
+			counter ++;
+		} 
+		//Set The Number on Tile
+		if (counter > 0) {
+
+			Color newColor = Color.LIGHT_GRAY;
+			panel.mineField[x][y] = newColor;	
+			panel.numGrid[x][y] =  counter + "";
+
+		} else {
+			//If Not Mine Found
+			if((x - 1 >= 0 && x - 1 < 9)
+					&&  (y >= 0 && y < 9) 
+					&& !panel.mineField[x - 1][y].equals(Color.GRAY) 
+					&& !panel.mineField[x - 1][y].equals(Color.RED) 
+					&& !panel.isMine(x - 1, y)){
+				Color newColor =  Color.GRAY;
+				panel.mineField[x - 1][y] = newColor;
+				checkBombs(panel, x - 1, y);	
+			} 
+			if((x - 1 >= 0 && x - 1 < 9)
+					&&  (y -1 >= 0 && y -1 < 9) 
+					&& !panel.mineField[x - 1][y -1].equals(Color.GRAY) 
+					&& !panel.mineField[x - 1][y -1].equals(Color.RED) 
+					&& !panel.isMine(x - 1, y -1)){
+				Color newColor =  Color.GRAY;
+				panel.mineField[x - 1][y -1] = newColor;
+				checkBombs(panel, x - 1, y -1);
+			} 
+			if((x - 1 >= 0 && x - 1 < 9)
+					&&  (y + 1 >= 0 && y + 1 < 9) 
+					&& !panel.mineField[x - 1][y + 1].equals(Color.GRAY) 
+					&& !panel.mineField[x - 1][y + 1].equals(Color.RED) 
+					&& !panel.isMine(x - 1, y + 1)){
+				Color newColor =  Color.GRAY;
+				panel.mineField[x - 1][y + 1] = newColor;
+				checkBombs(panel, x - 1, y + 1);
+			} 
+			if((x >= 0 && x < 9)
+					&&  (y -1 >= 0 && y -1 < 9) 
+					&& !panel.mineField[x][y -1].equals(Color.GRAY) 
+					&& !panel.mineField[x][y -1].equals(Color.RED) 
+					&& !panel.isMine(x, y -1)){
+				Color newColor =  Color.GRAY;
+				panel.mineField[x][y -1] = newColor;
+				checkBombs(panel, x, y -1);
+			} 
+			if((x >= 0 && x < 9)
+					&&  (y + 1 >= 0 && y + 1 < 9) 
+					&& !panel.mineField[x][y + 1].equals(Color.GRAY) 
+					&& !panel.mineField[x][y + 1].equals(Color.RED) 
+					&& !panel.isMine(x, y + 1)){
+				Color newColor =  Color.GRAY;
+				panel.mineField[x][y + 1] = newColor;
+				checkBombs(panel, x, y + 1);
+			} 
+			if((x + 1 >= 0 && x + 1 < 9)
+					&&  (y >= 0 && y < 9) 
+					&& !panel.mineField[x + 1][y].equals(Color.GRAY) 
+					&& !panel.mineField[x + 1][y].equals(Color.RED) 
+					&& !panel.isMine(x + 1, y)){
+				Color newColor =  Color.GRAY;
+				panel.mineField[x + 1][y] = newColor;
+				checkBombs(panel, x + 1, y);
+			} 
+			if((x + 1 >= 0 && x + 1 < 9)
+					&&  (y - 1>= 0 && y -1 < 9) 
+					&& !panel.mineField[x + 1][y -1].equals(Color.GRAY) 
+					&& !panel.mineField[x + 1][y - 1].equals(Color.RED) 
+					&& !panel.isMine(x + 1, y - 1)){
+				Color newColor =  Color.GRAY;
+				panel.mineField[x + 1][y - 1] = newColor;
+				checkBombs(panel, x + 1, y - 1);
+			} 
+			if((x + 1 >= 0 && x + 1 < 9)
+					&&  (y + 1 >= 0 && y + 1 < 9) 
+					&& !panel.mineField[x + 1][y + 1].equals(Color.GRAY) 
+					&& !panel.mineField[x + 1][y + 1].equals(Color.RED) 
+					&& !panel.isMine(x + 1, y + 1)){
+				Color newColor =  Color.GRAY;
+				panel.mineField[x + 1][y + 1] = newColor;
+				checkBombs(panel, x + 1, y + 1);
+			} 
 		}
 	}
 }
+
+
