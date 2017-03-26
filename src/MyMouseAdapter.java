@@ -163,7 +163,56 @@ public class MyMouseAdapter extends MouseAdapter {
 			myPanel.repaint();
 			break;
 		case 3: // Right mouse button
-			
+
+			if ((myPanel.mouseDownGridX == -1) || (myPanel.mouseDownGridY == -1) || (myPanel.mouseDownGridX > 8)
+					|| (myPanel.mouseDownGridY > 8)) {
+				// Had pressed outside
+				// Do nothing
+			} else {
+				if ((gridX == -1) || (gridY == -1)) {
+					// Is releasing outside
+					// Do nothing
+				} else {
+					if ((myPanel.mouseDownGridX != gridX) || (myPanel.mouseDownGridY != gridY)) {
+						// Released the mouse button on a different cell where
+						// it was pressed
+						// Do nothing
+					} else {
+						// Released the mouse button on the same cell where it
+						// was pressed
+						if ((gridX > 8) && (gridY > 8)) {
+						} else {
+							
+							//Paints tile red, representing Flags, when the original tile is white
+							
+							if (myPanel.mineField[myPanel.mouseDownGridX][myPanel.mouseDownGridY].equals(Color.WHITE)){
+								if (flags > 0){
+									Color newColor = Color.RED;
+									flags--;
+									redTiles ++;
+									myPanel.mineField[myPanel.mouseDownGridX][myPanel.mouseDownGridY] = newColor;
+									myPanel.repaint();
+								}
+							}
+							//If the tile is gray, does nothing
+							
+							else if (myPanel.mineField[myPanel.mouseDownGridX][myPanel.mouseDownGridY].equals(Color.GRAY)){
+								break;
+							}
+							//If the tile is red, it paints it white, representing a removal of flags
+							
+							else if(myPanel.mineField[myPanel.mouseDownGridX][myPanel.mouseDownGridY].equals(Color.RED)){
+								flags ++;
+								redTiles--;
+								Color newColor = Color.WHITE;
+								myPanel.mineField[myPanel.mouseDownGridX][myPanel.mouseDownGridY] = newColor;
+								myPanel.repaint();
+							}
+						}
+					}
+				}
+			}
+			myPanel.repaint();
 			break;
 		default: // Some other button (2 = Middle mouse button, etc.)
 			// Do nothing
