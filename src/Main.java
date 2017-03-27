@@ -137,6 +137,19 @@ public class Main {
 		myPanel.add(lblTime);	
 		return myFrame;
 	}
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
 
 

@@ -1,12 +1,12 @@
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-
+import java.awt.Image;
 import java.awt.Insets;
-
-
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
-
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 public class MyPanel extends JPanel {
@@ -77,12 +77,19 @@ public class MyPanel extends JPanel {
 		Insets myInsets = getInsets();
 		int x1 = myInsets.left;
 		int y1 = myInsets.top;
-		//int x2 = getWidth() - myInsets.right - 1;
-		//int y2 = getHeight() - myInsets.bottom - 1;
-		//int width = x2 - x1;
-		//int height = y2 - y1;
+		int x2 = getWidth() - myInsets.right - 1;
+		int y2 = getHeight() - myInsets.bottom - 1;
+		int width = x2 - x1;
+		int height = y2 - y1;
 
-		
+		//Set the background
+		Image img = null;
+		try {
+		 img = ImageIO.read(new File("Images/Need_some_Chocolate.jpg"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		g.drawImage(img, x1, y1, width + 1, height + 1, null);
 
 		
 		//Draw the grid minus the bottom row (which has only one cell)
