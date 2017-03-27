@@ -91,7 +91,7 @@ public class Main {
 		tasknew = new TimerCounter();
 		timer = new Timer();		
 		lblTime = new JLabel();
-		lblTime.setForeground(new Color(204, 255, 0));
+		lblTime.setForeground(new Color(154, 100, 250));
 		timer.schedule(new TimerTask(){
 			@Override
 			public void run() {
